@@ -2,7 +2,7 @@
 
 Webová aplikace pro evidenci konzumace alkoholu v průběhu drinking session. Počítá SAJ (standardní alkoholické jednotky) a zaznamenává časy a doby konzumace.
 
-**Živá aplikace:** https://miromar.github.io/alcopilot/
+**Živá aplikace:** https://miromar2022.github.io/alcopilot/
 
 ## Tech stack
 
