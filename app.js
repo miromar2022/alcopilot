@@ -70,7 +70,7 @@ function removeSaj() {
 
 function resetSession() {
   if (timestamps.length === 0) return;
-  if (!confirm('Opravdu ukončit drinking session? Tato akce nelze vrátit.')) return;
+  if (!confirm('Opravdu ukončit drinking session? Tuto akci nelze vrátit.')) return;
   timestamps = [];
   render();
 }
