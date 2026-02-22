@@ -1,1 +1,281 @@
-/* Alcopilot styles */
+/* ============================================================
+   1. Custom properties + base reset
+   ============================================================ */
+:root {
+  --bg:             #1a1a2e;
+  --surface:        #16213e;
+  --surface-2:      #0f3460;
+  --accent-plus:    #e94560;
+  --accent-minus:   #4a9eff;
+  --btn-reset-bg:   #2a2a4a;
+  --text-primary:   #eaeaea;
+  --text-secondary: #8888aa;
+  --text-disabled:  #44445a;
+  --border:         #2a2a5a;
+  --tap-target:     64px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   2. App shell
+   ============================================================ */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100dvh;
+  padding-block-end: 2rem;
+}
+
+/* ============================================================
+   3. Header
+   ============================================================ */
+.app-header {
+  width: 100%;
+  max-width: 600px;
+  padding: 1rem 1.25rem 0;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   4. Main content
+   ============================================================ */
+.app-main {
+  width: 100%;
+  max-width: 600px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ============================================================
+   5. Counter section
+   ============================================================ */
+.counter-section {
+  text-align: center;
+}
+
+.session-start {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.counter-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.counter-value {
+  font-size: clamp(5rem, 20vw, 8rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.counter-label {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   6. Controls section
+   ============================================================ */
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-row--primary {
+  justify-content: center;
+}
+
+.btn-row--secondary {
+  justify-content: center;
+}
+
+/* Base button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--accent-plus);
+  outline-offset: 3px;
+}
+
+/* + SAJ */
+.btn-plus {
+  min-width: var(--tap-target);
+  min-height: var(--tap-target);
+  flex: 1;
+  max-width: 200px;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent-plus);
+  color: #fff;
+}
+
+/* − SAJ */
+.btn-minus {
+  min-width: var(--tap-target);
+  min-height: var(--tap-target);
+  flex: 1;
+  max-width: 200px;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent-minus);
+  color: #fff;
+}
+
+.btn-minus:disabled {
+  background: var(--btn-reset-bg);
+  color: var(--text-disabled);
+}
+
+/* Reset */
+.btn-reset {
+  width: 100%;
+  /* 200px btn-plus + 200px btn-minus + 12px gap = 412px */
+  max-width: 412px;
+  padding: 0.75rem 1.5rem;
+  background: var(--btn-reset-bg);
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+}
+
+/* ============================================================
+   7. Log section
+   ============================================================ */
+.log-section {
+  overflow-x: auto;
+}
+
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.9rem;
+}
+
+.log-table th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.log-table td {
+  padding: 0.625rem 0.75rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+}
+
+.log-table tbody tr:nth-child(odd) {
+  background: var(--surface);
+}
+
+.log-table tbody tr:first-child {
+  background: var(--surface-2);
+}
+
+.log-table tbody:empty::after {
+  content: "Žádné záznamy";
+  display: block;
+  padding: 1.25rem 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* ============================================================
+   8. Landscape on small screens
+   ============================================================ */
+@media (orientation: landscape) and (max-height: 500px) {
+  .app-main {
+    gap: 1rem;
+    padding-block: 0.5rem;
+  }
+
+  .counter-value {
+    font-size: clamp(3rem, 12vh, 5rem);
+  }
+
+  .app-header {
+    padding-block-start: 0.5rem;
+  }
+}
+
+/* ============================================================
+   9. Desktop
+   ============================================================ */
+@media (min-width: 1024px) {
+  .app-header,
+  .app-main {
+    padding-inline: 2rem;
+  }
+
+  .app-main {
+    gap: 2.5rem;
+  }
+
+  .counter-value {
+    font-size: 8rem;
+  }
+}

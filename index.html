@@ -9,6 +9,47 @@
   <link rel="manifest" href="manifest.json" />
 </head>
 <body>
+  <div class="app-shell">
+    <header class="app-header">
+      <h1 class="app-title">Alcopilot</h1>
+    </header>
+    <main class="app-main">
+
+      <section class="counter-section" aria-label="Počítadlo SAJ">
+        <p class="session-start" id="session-start" hidden>
+          Začátek: <time id="session-start-time"></time>
+        </p>
+        <div class="counter-display">
+          <span class="counter-value" id="saj-count" aria-live="polite" aria-atomic="true">0</span>
+          <span class="counter-label">SAJ</span>
+        </div>
+      </section>
+
+      <section class="controls-section" aria-label="Ovládání">
+        <div class="btn-row btn-row--primary">
+          <button class="btn btn-plus"  id="btn-add"    type="button" aria-label="Přidat SAJ">+ SAJ</button>
+          <button class="btn btn-minus" id="btn-remove" type="button" aria-label="Ubrat SAJ" disabled>− SAJ</button>
+        </div>
+        <div class="btn-row btn-row--secondary">
+          <button class="btn btn-reset" id="btn-reset"  type="button" aria-label="Resetovat session">Reset</button>
+        </div>
+      </section>
+
+      <section class="log-section" aria-label="Časový log">
+        <table class="log-table" id="log-table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Čas</th>
+              <th scope="col">Doba konzumace</th>
+            </tr>
+          </thead>
+          <tbody id="log-body"></tbody>
+        </table>
+      </section>
+
+    </main>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
