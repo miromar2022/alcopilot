@@ -21,6 +21,8 @@ const els = {
 let timestamps    = [];
 let timerInterval = null;   // handle pro setInterval live timeru
 
+const LS_KEY = 'alcopilot-session';
+
 /* ============================================================
    Helpers
    ============================================================ */
@@ -43,6 +45,29 @@ function elapsedText(fromTs) {
   const ms = Date.now() - fromTs;
   if (ms < 60000) return '< 1 min';
   return formatDuration(ms);
+}
+
+/* ============================================================
+   Persistence
+   ============================================================ */
+function saveSession() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(timestamps));
+  } catch {
+    // quota exceeded nebo private mode bez storage — ignorovat
+  }
+}
+
+function loadSession() {
+  try {
+    const stored = localStorage.getItem(LS_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) timestamps = parsed;
+    }
+  } catch {
+    timestamps = [];
+  }
 }
 
 /* ============================================================
@@ -120,19 +145,23 @@ function render() {
    ============================================================ */
 function addSaj() {
   timestamps.push(Date.now());
+  navigator.vibrate?.(50);
   render();
+  saveSession();
 }
 
 function removeSaj() {
   if (timestamps.length === 0) return;
   timestamps.pop();
   render();
+  saveSession();
 }
 
 function resetSession() {
   if (timestamps.length === 0) return;
   if (!confirm('Opravdu ukončit drinking session? Tuto akci nelze vrátit.')) return;
   timestamps = [];
+  localStorage.removeItem(LS_KEY);
   render();
 }
 
@@ -140,6 +169,7 @@ function resetSession() {
    Init
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
+  loadSession();
   els.btnAdd.addEventListener('click', addSaj);
   els.btnRemove.addEventListener('click', removeSaj);
   els.btnReset.addEventListener('click', resetSession);
