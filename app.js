@@ -9,7 +9,9 @@ const els = {
   count:        $('saj-count'),
   sessionStart: $('session-start'),
   startTime:    $('session-start-time'),
-  btnAdd:       $('btn-add'),
+  btnBeer:      $('btn-beer'),
+  btnWine:      $('btn-wine'),
+  btnShot:      $('btn-shot'),
   btnRemove:    $('btn-remove'),
   btnReset:     $('btn-reset'),
   logBody:      $('log-body'),
@@ -18,10 +20,17 @@ const els = {
 /* ============================================================
    State
    ============================================================ */
-let timestamps    = [];
-let timerInterval = null;   // handle pro setInterval live timeru
+let timestamps    = [];   // [{ts: Number, type: 'beer'|'wine'|'shot'}, ...]
+let timerInterval = null; // handle pro setInterval live timeru
+let stornoTimer   = null; // handle pro 10s storno timeout
 
 const LS_KEY = 'alcopilot-session';
+
+const DRINK_ICONS = {
+  beer: 'icons/beer.png',
+  wine: 'icons/wine.png',
+  shot: 'icons/shot.png',
+};
 
 /* ============================================================
    Helpers
@@ -47,6 +56,23 @@ function elapsedText(fromTs) {
   return formatDuration(ms);
 }
 
+/** Povolí Storno na zadanou dobu, poté ho deaktivuje */
+function enableStornoTemporarily(duration = 10000) {
+  if (stornoTimer !== null) clearTimeout(stornoTimer);
+  els.btnRemove.disabled = false;
+  stornoTimer = setTimeout(() => {
+    els.btnRemove.disabled = true;
+    stornoTimer = null;
+  }, duration);
+}
+
+function cancelStornoTimer() {
+  if (stornoTimer !== null) {
+    clearTimeout(stornoTimer);
+    stornoTimer = null;
+  }
+}
+
 /* ============================================================
    Persistence
    ============================================================ */
@@ -63,7 +89,12 @@ function loadSession() {
     const stored = localStorage.getItem(LS_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed)) timestamps = parsed;
+      if (Array.isArray(parsed)) {
+        // Migrace: starý formát (plain numbers) → nový formát ({ts, type})
+        timestamps = parsed.map((entry) =>
+          typeof entry === 'number' ? { ts: entry, type: 'beer' } : entry
+        );
+      }
     }
   } catch {
     timestamps = [];
@@ -85,30 +116,41 @@ function renderLog() {
 
   // Iterujeme od nejnovějšího (konec pole) k nejstaršímu
   for (let i = timestamps.length - 1; i >= 0; i--) {
+    const entry    = timestamps[i];
     const isNewest = (i === timestamps.length - 1);
-    const tr = document.createElement('tr');
+    const tr       = document.createElement('tr');
 
     // Sloupec #
     const tdNum = document.createElement('td');
     tdNum.textContent = i + 1;
     tr.appendChild(tdNum);
 
+    // Sloupec Nápoj (ikona)
+    const tdDrink = document.createElement('td');
+    tdDrink.style.textAlign = 'center';
+    const icon = document.createElement('img');
+    icon.src       = DRINK_ICONS[entry.type] || '';
+    icon.alt       = entry.type;
+    icon.className = 'log-drink-icon';
+    tdDrink.appendChild(icon);
+    tr.appendChild(tdDrink);
+
     // Sloupec Čas
     const tdTime = document.createElement('td');
-    tdTime.textContent = formatTime(new Date(timestamps[i]));
+    tdTime.textContent = formatTime(new Date(entry.ts));
     tr.appendChild(tdTime);
 
     // Sloupec Doba konzumace
     const tdDur = document.createElement('td');
     if (isNewest) {
       // Živý timer — aktualizuje se každých 60s
-      tdDur.textContent = elapsedText(timestamps[i]);
+      tdDur.textContent = elapsedText(entry.ts);
       timerInterval = setInterval(() => {
-        tdDur.textContent = elapsedText(timestamps[i]);
+        tdDur.textContent = elapsedText(entry.ts);
       }, 60000);
     } else {
       // Statický interval do dalšího SAJ
-      tdDur.textContent = formatDuration(timestamps[i + 1] - timestamps[i]);
+      tdDur.textContent = formatDuration(timestamps[i + 1].ts - entry.ts);
     }
     tr.appendChild(tdDur);
 
@@ -123,12 +165,15 @@ function render() {
   // Counter
   els.count.textContent = timestamps.length;
 
-  // − SAJ disabled state
-  els.btnRemove.disabled = timestamps.length === 0;
+  // Storno disabled state — timer řídí povolení, zde jen zajistíme disabled při prázdné session
+  if (timestamps.length === 0) {
+    cancelStornoTimer();
+    els.btnRemove.disabled = true;
+  }
 
   // Session start time
   if (timestamps.length > 0) {
-    const start = new Date(timestamps[0]);
+    const start = new Date(timestamps[0].ts);
     els.startTime.textContent = formatTime(start);
     els.startTime.setAttribute('datetime', start.toISOString());
     els.sessionStart.hidden = false;
@@ -143,11 +188,12 @@ function render() {
 /* ============================================================
    Event handlers
    ============================================================ */
-function addSaj() {
-  timestamps.push(Date.now());
+function addSaj(type) {
+  timestamps.push({ ts: Date.now(), type });
   navigator.vibrate?.(50);
   render();
   saveSession();
+  enableStornoTemporarily();
 }
 
 function removeSaj() {
@@ -155,6 +201,13 @@ function removeSaj() {
   timestamps.pop();
   render();
   saveSession();
+  // Po stornování: pokud je poslední záznam stále v 10s okně, povolíme Storno na zbývající čas
+  if (timestamps.length > 0) {
+    const elapsed = Date.now() - timestamps[timestamps.length - 1].ts;
+    if (elapsed < 10000) {
+      enableStornoTemporarily(10000 - elapsed);
+    }
+  }
 }
 
 function resetSession() {
@@ -170,10 +223,20 @@ function resetSession() {
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
   loadSession();
-  els.btnAdd.addEventListener('click', addSaj);
+  els.btnBeer.addEventListener('click', () => addSaj('beer'));
+  els.btnWine.addEventListener('click', () => addSaj('wine'));
+  els.btnShot.addEventListener('click', () => addSaj('shot'));
   els.btnRemove.addEventListener('click', removeSaj);
   els.btnReset.addEventListener('click', resetSession);
   render();
+
+  // Po načtení: pokud je poslední záznam < 10s starý, povolit Storno na zbývající čas
+  if (timestamps.length > 0) {
+    const elapsed = Date.now() - timestamps[timestamps.length - 1].ts;
+    if (elapsed < 10000) {
+      enableStornoTemporarily(10000 - elapsed);
+    }
+  }
 
   // Service Worker registrace
   if ('serviceWorker' in navigator) {

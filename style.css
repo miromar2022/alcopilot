@@ -58,6 +58,7 @@ body {
   letter-spacing: 0.15em;
   color: var(--text-secondary);
   text-transform: uppercase;
+  text-align: center;
 }
 
 /* ============================================================
@@ -159,23 +160,47 @@ body {
   outline-offset: 3px;
 }
 
-/* + SAJ */
-.btn-plus {
-  min-width: var(--tap-target);
-  min-height: var(--tap-target);
-  flex: 1;
-  max-width: 200px;
-  padding: 0.75rem 1.5rem;
-  background: var(--accent-plus);
-  color: #fff;
+/* Drink buttons */
+.btn-row--drinks {
+  justify-content: center;
+  gap: 1rem;
 }
 
-/* − SAJ */
-.btn-minus {
+.drink-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: var(--surface);
+  cursor: pointer;
+  padding: 0.5rem;
   min-width: var(--tap-target);
   min-height: var(--tap-target);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.drink-btn:active {
+  transform: scale(0.93);
+}
+
+.drink-btn:focus-visible {
+  outline: 3px solid var(--accent-plus);
+  outline-offset: 3px;
+}
+
+.drink-btn__img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Storno */
+.btn-minus {
   flex: 1;
-  max-width: 200px;
   padding: 0.75rem 1.5rem;
   background: var(--accent-minus);
   color: #fff;
@@ -188,9 +213,7 @@ body {
 
 /* Reset */
 .btn-reset {
-  width: 100%;
-  /* 200px btn-plus + 200px btn-minus + 12px gap = 412px */
-  max-width: 412px;
+  flex: 1;
   padding: 0.75rem 1.5rem;
   background: var(--btn-reset-bg);
   color: var(--text-secondary);
@@ -207,8 +230,20 @@ body {
 .log-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
   font-size: 0.9rem;
+}
+
+.col-drink {
+  width: 3rem;
+  text-align: center;
+}
+
+.log-drink-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  vertical-align: middle;
 }
 
 .log-table th {
