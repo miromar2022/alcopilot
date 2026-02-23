@@ -174,4 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
   els.btnRemove.addEventListener('click', removeSaj);
   els.btnReset.addEventListener('click', resetSession);
   render();
+
+  // Service Worker registrace
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
 });
