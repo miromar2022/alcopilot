@@ -26,11 +26,19 @@
       </section>
 
       <section class="controls-section" aria-label="Ovládání">
-        <div class="btn-row btn-row--primary">
-          <button class="btn btn-plus"  id="btn-add"    type="button" aria-label="Přidat SAJ">+ SAJ</button>
-          <button class="btn btn-minus" id="btn-remove" type="button" aria-label="Ubrat SAJ" disabled>− SAJ</button>
+        <div class="btn-row btn-row--drinks">
+          <button class="drink-btn" id="btn-beer" type="button" aria-label="Přidat pivo">
+            <img src="icons/beer.png" alt="Pivo" class="drink-btn__img" />
+          </button>
+          <button class="drink-btn" id="btn-wine" type="button" aria-label="Přidat víno">
+            <img src="icons/wine.png" alt="Víno" class="drink-btn__img" />
+          </button>
+          <button class="drink-btn" id="btn-shot" type="button" aria-label="Přidat panák">
+            <img src="icons/shot.png" alt="Panák" class="drink-btn__img" />
+          </button>
         </div>
         <div class="btn-row btn-row--secondary">
+          <button class="btn btn-minus" id="btn-remove" type="button" aria-label="Storno posledního SAJ" disabled>Storno</button>
           <button class="btn btn-reset" id="btn-reset"  type="button" aria-label="Resetovat session">Reset</button>
         </div>
       </section>
@@ -40,6 +48,7 @@
           <thead>
             <tr>
               <th scope="col">#</th>
+              <th scope="col" class="col-drink">Nápoj</th>
               <th scope="col">Čas</th>
               <th scope="col">Doba konzumace</th>
             </tr>

@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'alcopilot-v1';
+const CACHE_NAME = 'alcopilot-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -9,6 +9,9 @@ const ASSETS = [
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
+  '/icons/beer.png',
+  '/icons/wine.png',
+  '/icons/shot.png',
 ];
 
 /* Instalace — předcachovat všechny statické soubory */
