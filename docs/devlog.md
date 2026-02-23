@@ -275,19 +275,14 @@ app.js (~170 řádků)
 | #4 | Časový log | ✅ CLOSED |
 | #5 | Perzistence (localStorage) | ✅ CLOSED |
 | #6 | Haptická zpětná vazba | ✅ CLOSED |
-| #7 | PWA (manifest + service worker) | 🔄 OPEN |
+| #7 | PWA (manifest + service worker) | ✅ CLOSED |
 | #8 | QA a finální review | 🔄 OPEN |
 
-**MVP postup: 6/8 hotovo (75 %)**
+**MVP postup: 7/8 hotovo (87.5 %)**
 
 ---
 
 ### 5. Zbývající práce
-
-#### Issue #7 — PWA
-- Zkontrolovat/doplnit `manifest.json` (name, display: standalone, ikony, theme-color)
-- Napsat `sw.js` — cache strategie pro offline (HTML, CSS, JS, manifest, ikony)
-- Otestovat installability v Chrome
 
 #### Issue #8 — QA
 - Android Chrome (fyzické zařízení / emulátor)
@@ -303,6 +298,90 @@ app.js (~170 řádků)
 | Problém | Priorita | Kdy řešit |
 |---------|----------|-----------|
 | `tbody:empty::after` cross-browser quirks | Nízká | Issue #8 (QA) |
-| `manifest.json` — ověřit kompletnost | Střední | Issue #7 |
-| `sw.js` — neexistuje | Vysoká | Issue #7 |
-| Stale branches (`chore/add-dev-folder`, `feature/ui-layout`, `feature/session-management`) | Nízká | Úklid po MVP |
+| Stale branches (`chore/add-dev-folder`, `feature/ui-layout`, `feature/session-management`, `feature/persistence`, `feature/pwa`) | Nízká | Úklid po MVP |
+
+---
+
+## DEN 3 (2026-02-22 — pokračování)
+
+### 1. Shrnutí
+
+PR #14 (Issue #7 — PWA) úspěšně mergnuto uživatelem. `main` aktualizován na `5c907d1`. Issues #1–#7 všechny closed. Zbývá pouze Issue #8 (QA). MVP je 7/8 hotovo.
+
+---
+
+### 2. Stav `main` po PR #14
+
+```
+5c907d1  Merge pull request #14 from miromar2022/feature/pwa
+80f0db5  feat: add PWA manifest and service worker (Issue #7)
+96706c0  docs: update devlog with DEN 2 progress summary
+57b81e7  Merge pull request #13 from miromar2022/feature/persistence
+ef4e134  feat: add localStorage persistence and haptic feedback (Issue #5, #6)
+4883d46  Merge pull request #12 from miromar2022/feature/session-management
+14da0aa  feat: add time log with duration calculation (Issue #4)
+349ff16  Merge pull request #11 from miromar2022/feature/session-management
+ce57641  Update confirmation message in resetSession function
+6bd8524  feat: add session management and SAJ counter (Issue #3)
+```
+
+#### Soubory v `main` (aktuálně)
+
+| Soubor | Stav | Poznámka |
+|--------|------|----------|
+| `index.html` | ✅ Finální | Sémantický HTML, a11y atributy |
+| `style.css` | ✅ Finální | Dark theme, responsive, focus-visible |
+| `app.js` | ✅ Finální | 170 řádků — session, log, persistence, haptika, SW |
+| `manifest.json` | ✅ Nový (PR #14) | name, standalone, theme-color, 2 ikony |
+| `sw.js` | ✅ Nový (PR #14) | Cache-first, skipWaiting, clients.claim |
+| `docs/devlog.md` | ✅ Tento soubor | Průběžně aktualizován |
+
+---
+
+### 3. Issue #7 — PWA (PR #14, commit `80f0db5`)
+
+#### Co bylo implementováno
+
+**`manifest.json`:**
+- `name: "Alcopilot"`, `short_name: "Alcopilot"`
+- `display: "standalone"` — spustí se bez adresního řádku
+- `background_color` + `theme_color`: `#1a1a2e` (dark navy)
+- 2 ikony: `icon-192.png` (192×192) + `icon-512.png` (512×512)
+
+**`sw.js`:**
+- `CACHE_NAME = 'alcopilot-v1'`
+- Precache: `/`, `/index.html`, `/style.css`, `/app.js`, `/manifest.json`, `/icons/icon-192.png`, `/icons/icon-512.png`
+- Install: `cache.addAll(ASSETS)` + `skipWaiting`
+- Activate: smazat staré cache + `clients.claim`
+- Fetch: cache-first → fallback na síť
+
+**`app.js` — SW registrace:**
+```javascript
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+```
+- Feature detection — žádná chyba na prohlížečích bez SW podpory
+
+#### Ověření (preview_eval)
+- ✅ Manifest načten (`document.querySelector('link[rel="manifest"]')`)
+- ✅ SW zaregistrován (stav `activated`)
+- ✅ Žádné JS chyby v konzoli
+
+---
+
+### 4. Zbývající práce — Issue #8 (QA)
+
+Jediný zbývající issue pro uzavření MVP milestone.
+
+#### Checklist (dle GITHUB_ISSUES.md)
+- [ ] Android Chrome — fyzické zařízení nebo emulátor
+- [ ] iOS Safari — fyzické zařízení nebo simulátor
+- [ ] Desktop Chrome
+- [ ] Desktop Firefox
+- [ ] Lighthouse PWA audit — Performance, Accessibility, PWA kategorie
+- [ ] Ověřit +SAJ / −SAJ / Reset na všech platformách
+- [ ] Ověřit localStorage persistence (reload)
+- [ ] Ověřit offline režim (Service Worker)
+- [ ] Ověřit haptiku na Android (fyzické zařízení)
+- [ ] Installability check (Add to Home Screen prompt)
