@@ -188,3 +188,121 @@ alcopilot/
 | `sw.js` neexistuje | Střední | Issue #7 |
 | `app.js` prázdný | Vysoká | Issue #3 (další v pořadí) |
 | Stale branch `chore/add-dev-folder` | Nízká | Smazat po úklidu |
+
+---
+
+## DEN 2 (2026-02-22)
+
+### 1. Shrnutí
+
+Dokončena veškerá aplikační logika. Issues #3–#6 implementovány a mergnuty do `main`. `app.js` je plně funkční — session management, časový log, perzistence, haptika. MVP je ze 6/8 issues hotovo, zbývá pouze Issue #7 (PWA) a Issue #8 (QA).
+
+---
+
+### 2. Provedené práce
+
+#### PR review — PR #10 (UI layout)
+- 6 komentářů od Copilot AI vyhodnoceno a zodpovězeno přímo v PR
+- **Opraveno:** chybějící `:focus-visible` styly na tlačítkách (a11y, commit `26f4376`)
+- **Zamítnuto:** whitespace zarovnání (záměrné), nth-child konflikt (záměrný design)
+- **Odloženo:** `<time datetime>` na Issue #3, `tbody:empty` na QA
+
+#### Organizace repozitáře
+- `GITHUB_ISSUES.md` přesunut do `_dev/` — GitHub issues jsou single source of truth (commit `217e462`)
+- Ověřeno: všech 8 issues existuje na GitHubu se správným obsahem, labels a milestony
+- Issue #2 uzavřen ručně (PR #10 neměl `Closes #2` v popisu)
+- Dev server nakonfigurován přes `.claude/launch.json` (node HTTP server, port 8080)
+- `docs/devlog.md` vytvořen jako podrobný záznam práce
+
+#### Issue #3 — Session management (PR #11, commit `6bd8524`)
+- Implementován celý `app.js` od základu
+- `timestamps[]` array jako datová struktura (epoch ms)
+- `addSaj()` / `removeSaj()` / `resetSession()` s confirmation dialogem
+- Session start time zobrazen při prvním SAJ (`<time datetime="">` s ISO 8601)
+- `−SAJ` disabled při count = 0
+- Confirm text: *"Opravdu ukončit drinking session? Tuto akci nelze vrátit."*
+
+#### Issue #4 — Časový log (PR #12, commit `14da0aa`)
+- `renderLog()` — iterace od nejnovějšího záznamu (konec pole) k nejstaršímu
+- Číslování: SAJ #N = index+1, nejnovější nahoře
+- "Doba konzumace" = interval od tohoto SAJ do dalšího (`formatDuration(ms)`)
+- Formáty: `X min` (< 60 min) / `X hod Y min` (≥ 60 min)
+- Živý timer u posledního záznamu: `elapsedText()` aktualizovaný každých 60s přes `setInterval`
+- `< 1 min` v prvních 60 sekundách
+- `clearInterval` při každém re-renderu — žádný setInterval leak
+
+#### Issue #5 + #6 — Perzistence + Haptika (PR #13, commit `ef4e134`)
+- `LS_KEY = 'alcopilot-session'` — namespaced klíč
+- `saveSession()` — `JSON.stringify(timestamps)` po každé mutaci
+- `loadSession()` — `JSON.parse` + `Array.isArray` validace při `DOMContentLoaded`
+- Veškeré localStorage operace v `try-catch` (quota exceeded, private mode)
+- Reset: `localStorage.removeItem(LS_KEY)` (ne `clear()` — nezasahuje do jiných dat)
+- `navigator.vibrate?.(50)` v `addSaj()` — optional chaining, žádná chyba na desktopu
+
+---
+
+### 3. Aktuální stav `app.js` (po DEN 2)
+
+```
+app.js (~170 řádků)
+├── DOM references (els object)
+├── State: timestamps[], timerInterval, LS_KEY
+├── Helpers: formatTime(), formatDuration(), elapsedText()
+├── Persistence: saveSession(), loadSession()
+├── Log render: renderLog() se setInterval live timerem
+├── Render: render() — counter, session start, renderLog()
+├── Event handlers: addSaj(), removeSaj(), resetSession()
+└── Init: DOMContentLoaded → loadSession() → listenery → render()
+```
+
+---
+
+### 4. Stav PRs a issues (konec DEN 2)
+
+| PR | Větev | Stav | Issues |
+|----|-------|------|--------|
+| #9 | `chore/add-dev-folder` | ✅ MERGED | — |
+| #10 | `feature/ui-layout` | ✅ MERGED | Closes #2 |
+| #11 | `feature/session-management` | ✅ MERGED | Closes #3 |
+| #12 | `feature/session-management` | ✅ MERGED | Closes #4 |
+| #13 | `feature/persistence` | ✅ MERGED | Closes #5, #6 |
+
+| Issue | Název | Stav |
+|-------|-------|------|
+| #1 | Inicializace | ✅ CLOSED |
+| #2 | Základní UI layout | ✅ CLOSED |
+| #3 | Session management | ✅ CLOSED |
+| #4 | Časový log | ✅ CLOSED |
+| #5 | Perzistence (localStorage) | ✅ CLOSED |
+| #6 | Haptická zpětná vazba | ✅ CLOSED |
+| #7 | PWA (manifest + service worker) | 🔄 OPEN |
+| #8 | QA a finální review | 🔄 OPEN |
+
+**MVP postup: 6/8 hotovo (75 %)**
+
+---
+
+### 5. Zbývající práce
+
+#### Issue #7 — PWA
+- Zkontrolovat/doplnit `manifest.json` (name, display: standalone, ikony, theme-color)
+- Napsat `sw.js` — cache strategie pro offline (HTML, CSS, JS, manifest, ikony)
+- Otestovat installability v Chrome
+
+#### Issue #8 — QA
+- Android Chrome (fyzické zařízení / emulátor)
+- iOS Safari (fyzické zařízení / simulátor)
+- Desktop Chrome + Firefox
+- Lighthouse PWA audit — žádné kritické chyby
+- Ověřit všechna acceptance criteria #1–#7
+
+---
+
+### 6. Technický dluh (aktualizovaný)
+
+| Problém | Priorita | Kdy řešit |
+|---------|----------|-----------|
+| `tbody:empty::after` cross-browser quirks | Nízká | Issue #8 (QA) |
+| `manifest.json` — ověřit kompletnost | Střední | Issue #7 |
+| `sw.js` — neexistuje | Vysoká | Issue #7 |
+| Stale branches (`chore/add-dev-folder`, `feature/ui-layout`, `feature/session-management`) | Nízká | Úklid po MVP |
