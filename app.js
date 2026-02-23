@@ -240,6 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Service Worker registrace
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 });
