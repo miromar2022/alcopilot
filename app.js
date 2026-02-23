@@ -22,6 +22,7 @@ const els = {
    ============================================================ */
 let timestamps    = [];   // [{ts: Number, type: 'beer'|'wine'|'shot'}, ...]
 let timerInterval = null; // handle pro setInterval live timeru
+let stornoTimer   = null; // handle pro 10s storno timeout
 
 const LS_KEY = 'alcopilot-session';
 
@@ -53,6 +54,23 @@ function elapsedText(fromTs) {
   const ms = Date.now() - fromTs;
   if (ms < 60000) return '< 1 min';
   return formatDuration(ms);
+}
+
+/** Povolí Storno na zadanou dobu, poté ho deaktivuje */
+function enableStornoTemporarily(duration = 10000) {
+  if (stornoTimer !== null) clearTimeout(stornoTimer);
+  els.btnRemove.disabled = false;
+  stornoTimer = setTimeout(() => {
+    els.btnRemove.disabled = true;
+    stornoTimer = null;
+  }, duration);
+}
+
+function cancelStornoTimer() {
+  if (stornoTimer !== null) {
+    clearTimeout(stornoTimer);
+    stornoTimer = null;
+  }
 }
 
 /* ============================================================
@@ -147,8 +165,11 @@ function render() {
   // Counter
   els.count.textContent = timestamps.length;
 
-  // Storno disabled state
-  els.btnRemove.disabled = timestamps.length === 0;
+  // Storno disabled state — timer řídí povolení, zde jen zajistíme disabled při prázdné session
+  if (timestamps.length === 0) {
+    cancelStornoTimer();
+    els.btnRemove.disabled = true;
+  }
 
   // Session start time
   if (timestamps.length > 0) {
@@ -172,6 +193,7 @@ function addSaj(type) {
   navigator.vibrate?.(50);
   render();
   saveSession();
+  enableStornoTemporarily();
 }
 
 function removeSaj() {
@@ -179,6 +201,13 @@ function removeSaj() {
   timestamps.pop();
   render();
   saveSession();
+  // Po stornování: pokud je poslední záznam stále v 10s okně, povolíme Storno na zbývající čas
+  if (timestamps.length > 0) {
+    const elapsed = Date.now() - timestamps[timestamps.length - 1].ts;
+    if (elapsed < 10000) {
+      enableStornoTemporarily(10000 - elapsed);
+    }
+  }
 }
 
 function resetSession() {
@@ -200,6 +229,14 @@ document.addEventListener('DOMContentLoaded', () => {
   els.btnRemove.addEventListener('click', removeSaj);
   els.btnReset.addEventListener('click', resetSession);
   render();
+
+  // Po načtení: pokud je poslední záznam < 10s starý, povolit Storno na zbývající čas
+  if (timestamps.length > 0) {
+    const elapsed = Date.now() - timestamps[timestamps.length - 1].ts;
+    if (elapsed < 10000) {
+      enableStornoTemporarily(10000 - elapsed);
+    }
+  }
 
   // Service Worker registrace
   if ('serviceWorker' in navigator) {
