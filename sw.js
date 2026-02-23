@@ -1,17 +1,17 @@
 'use strict';
 
-const CACHE_NAME = 'alcopilot-v3';
+const CACHE_NAME = 'alcopilot-v4';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/app.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/icons/beer.png',
-  '/icons/wine.png',
-  '/icons/shot.png',
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/beer.png',
+  './icons/wine.png',
+  './icons/shot.png',
 ];
 
 /* Instalace — předcachovat všechny statické soubory */
