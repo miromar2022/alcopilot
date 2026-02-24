@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Zero Dependencies** — Vanilla HTML/CSS/JavaScript, no framework required
 - **No Build Step** — Direct static file deployment to GitHub Pages
-- **Accessibility** — WCAG 2.1 compliant (44px tap targets, aria-labels, keyboard support)
+- **Accessibility** — WCAG 2.1 compliant (80px drink buttons, 44px info button, aria-labels, keyboard support)
 - **Dark Theme** — Eye-friendly dark mode with CSS variables
 - **PWA Manifest** — Installable as standalone app with custom splash screen
 

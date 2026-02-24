@@ -24,7 +24,7 @@ Vanilla HTML/CSS/JS **bez frameworku, bez závislostí, bez build kroku.**
 
 - `index.html` – App shell + UI
 - `style.css` – Dark theme styling (CSS variables)
-- `app.js` – Logika (257 řádků)
+- `app.js` – Logika
 - `sw.js` – Service Worker pro offline + caching
 - `manifest.json` – PWA metadata
 

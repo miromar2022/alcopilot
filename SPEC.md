@@ -1,5 +1,11 @@
 # Alcopilot – Specifikace MVP
 
+> **Poznámka:** Tento dokument popisuje původní MVP plán. Od v1.0.0 aplikace obsahuje rozšíření nad rámec tohoto dokumentu — viz [`CHANGELOG.md`](CHANGELOG.md) pro aktuální stav:
+> - Drink type buttons (pivo, víno, panák) místo jednoho `+ SAJ` tlačítka
+> - Storno s 10s auto-disable místo trvalého `− SAJ`
+> - Duration chart (sloupcový graf intervalů)
+> - Info dialog se zobrazením verze
+
 ## Přehled
 
 Webová aplikace plnící roli kopilota konzumenta alkoholických nápojů. Umožňuje evidovat konzumaci v jednotkách SAJ (standardní alkoholická jednotka) v průběhu jedné drinking session.
