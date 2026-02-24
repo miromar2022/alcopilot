@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION = '1.0.1';
+const APP_VERSION = '1.0.2';
 
 /* ============================================================
    DOM references
@@ -32,11 +32,10 @@ let timestamps    = [];   // [{ts: Number, type: 'beer'|'wine'|'shot'}, ...]
 let timerInterval = null; // handle pro setInterval live timeru
 let stornoTimer   = null; // handle pro 10s storno timeout
 
-const _rootStyle = getComputedStyle(document.documentElement);
 const DRINK_COLORS = {
-  beer: _rootStyle.getPropertyValue('--color-beer').trim() || '#f5a800',
-  wine: _rootStyle.getPropertyValue('--color-wine').trim() || '#9B1B30',
-  shot: _rootStyle.getPropertyValue('--color-shot').trim() || '#4a9eff',
+  beer: '#f5a800',
+  wine: '#9B1B30',
+  shot: '#4a9eff',
 };
 
 const LS_KEY = 'alcopilot-session';
@@ -163,8 +162,9 @@ function renderChart() {
   };
 
   const svg = els.chart;
-  const colorBorder    = _rootStyle.getPropertyValue('--border').trim()         || '#2a2a5a';
-  const colorTextSecondary = _rootStyle.getPropertyValue('--text-secondary').trim() || '#8888aa';
+  const _style = getComputedStyle(document.documentElement);
+  const colorBorder        = _style.getPropertyValue('--border').trim()         || '#2a2a5a';
+  const colorTextSecondary = _style.getPropertyValue('--text-secondary').trim() || '#8888aa';
 
   svg.innerHTML = '';
 
