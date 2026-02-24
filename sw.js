@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'alcopilot-v4';
+const CACHE_NAME = 'alcopilot-v5';
 const ASSETS = [
   './',
   './index.html',

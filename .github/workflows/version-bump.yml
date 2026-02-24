@@ -1,0 +1,110 @@
+name: Version Bump
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    # Nezpouštět znovu na commit samotného bumpu
+    if: "!startsWith(github.event.head_commit.message, 'chore: bump version')"
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Determine bump type from Conventional Commits
+        id: bump_type
+        run: |
+          TAG=${{ steps.get_tag.outputs.tag }}
+          COMMITS=$(git log ${TAG}..HEAD --pretty=format:"%s" 2>/dev/null || git log --pretty=format:"%s")
+
+          if echo "$COMMITS" | grep -qiE "BREAKING[[:space:]]CHANGE|^[a-z]+(\([^)]+\))?!:"; then
+            echo "type=major" >> $GITHUB_OUTPUT
+          elif echo "$COMMITS" | grep -qE "^feat(\([^)]+\))?:"; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+          else
+            echo "type=patch" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Calculate new version
+        id: new_version
+        run: |
+          CURRENT=$(node -p "require('./manifest.json').version")
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+          case "${{ steps.bump_type.outputs.type }}" in
+            major) NEW="$((MAJOR+1)).0.0" ;;
+            minor) NEW="${MAJOR}.$((MINOR+1)).0" ;;
+            patch) NEW="${MAJOR}.${MINOR}.$((PATCH+1))" ;;
+          esac
+
+          echo "version=$NEW" >> $GITHUB_OUTPUT
+          echo "Bump type: ${{ steps.bump_type.outputs.type }} → $CURRENT → $NEW"
+
+      - name: Install git-cliff
+        uses: taiki-e/install-action@v2
+        with:
+          tool: git-cliff
+
+      - name: Generate CHANGELOG.md
+        run: |
+          VERSION=${{ steps.new_version.outputs.version }}
+          git-cliff --tag "v${VERSION}" -o CHANGELOG.md
+
+      - name: Extract release notes (latest verze)
+        id: release_notes
+        run: |
+          VERSION=${{ steps.new_version.outputs.version }}
+          # Vygeneruje pouze sekci pro tuto verzi (bez hlavičky souboru)
+          NOTES=$(git-cliff --tag "v${VERSION}" --latest --strip header)
+          # Uložit do souboru kvůli multiline
+          echo "$NOTES" > /tmp/release_notes.md
+          echo "notes_file=/tmp/release_notes.md" >> $GITHUB_OUTPUT
+
+      - name: Update manifest.json
+        run: |
+          VERSION=${{ steps.new_version.outputs.version }}
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+            m.version = '${VERSION}';
+            fs.writeFileSync('manifest.json', JSON.stringify(m, null, 2) + '\n');
+          "
+
+      - name: Update CACHE_NAME in sw.js
+        run: |
+          VERSION=${{ steps.new_version.outputs.version }}
+          sed -i "s/const CACHE_NAME = 'alcopilot-v[^']*'/const CACHE_NAME = 'alcopilot-v${VERSION}'/" sw.js
+
+      - name: Commit, tag and push
+        run: |
+          VERSION=${{ steps.new_version.outputs.version }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json sw.js CHANGELOG.md
+          git commit -m "chore: bump version to v${VERSION}"
+          git tag "v${VERSION}"
+          git push
+          git push --tags
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.new_version.outputs.version }}
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --notes-file "${{ steps.release_notes.outputs.notes_file }}"
