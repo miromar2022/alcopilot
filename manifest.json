@@ -1,6 +1,6 @@
 {
   "name": "Alcopilot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "short_name": "Alcopilot",
   "description": "Sledování konzumace alkoholu v SAJ jednotkách",
   "start_url": ".",
