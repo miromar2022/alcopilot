@@ -385,3 +385,34 @@ Jediný zbývající issue pro uzavření MVP milestone.
 - [ ] Ověřit offline režim (Service Worker)
 - [ ] Ověřit haptiku na Android (fyzické zařízení)
 - [ ] Installability check (Add to Home Screen prompt)
+
+---
+
+## DEN 5 (2026-02-24)
+
+### Info Dialog & Version Display (PR #22 + #23)
+
+**Rozsah:** Přidání info ikony v headeru s verzí aplikace.
+
+**PR #22** — `feat: info ikona s verzí a definicí SAJ`
+- Tlačítko ℹ (SVG inline) v pravém rohu headeru
+- Nativní `<dialog>` element (nový HTML5 feature) místo `alert()`
+- Dark-theme styling s `.info-dialog`, `::backdrop` blur efektem
+- Dialog obsahoval verzi, definici SAJ a tabulku nápojů
+
+**Review & Fixes:**
+- Tap target: zvýšen z 36 px na 44 px (`padding: 0.75rem` + `min-width/height: 44px`)
+- Sémantika: přidán `<tbody>` do tabulky v dialogu
+- False positives: `.btn-info-close` již dědí `border-radius: 12px` a interaktivní stavy z `.btn`
+
+**PR #23** — `fix: info dialog zobrazuje pouze verzi`
+- Odstraněna tabulka a popis SAJ (uživatelská zpětná vazba)
+- CSS cleanup: odstraněny osiřelé třídy (`.info-dialog__sep`, `__table`, `__section-title` atd.)
+- Dialog je nyní minimalistický: jenom název a verze
+
+**Výsledek:**
+- 257 řádků app.js, 390 řádků style.css (minimálně bez frameworku)
+- Accessibility: WCAG 2.1 minimum tap targets, `aria-label`, keyboard support
+- UX: Zavření tlačítkem, backdrop klikem, Escape klávesou
+
+---
