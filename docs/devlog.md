@@ -385,3 +385,139 @@ Jediný zbývající issue pro uzavření MVP milestone.
 - [ ] Ověřit offline režim (Service Worker)
 - [ ] Ověřit haptiku na Android (fyzické zařízení)
 - [ ] Installability check (Add to Home Screen prompt)
+
+---
+
+## DEN 4 (2026-02-24)
+
+### 1. Průzkum repozitáře — souhrnný stav
+
+#### Aplikace (aktuální stav `main`)
+
+MVP je funkčně kompletní. Aplikace výrazně přesáhla původní specifikaci SPEC.md — jsou implementovány tyto funkce:
+
+| Funkce | Stav | Poznámka |
+|--------|------|----------|
+| SAJ počítadlo | ✅ | Velké číslo, zobrazuje se s labelem "SAJ" |
+| Čas začátku session | ✅ | Zobrazí se po prvním SAJ, `<time datetime="…">` |
+| Drink type tracking | ✅ | Tři tlačítka: 🍺 Pivo, 🍷 Víno, 🥃 Panák |
+| Časový log | ✅ | Tabulka: #, Nápoj (ikona), Čas, Doba konzumace |
+| Živý timer | ✅ | Poslední záznam, aktualizace každých 60 s |
+| Formát doby konzumace | ✅ | `< 1 min`, `X min`, `X hod Y min` |
+| Storno (undo) | ✅ | Povoleno 10 s po přidání SAJ, poté disabled |
+| Reset | ✅ | Potvrzovací dialog, vymaže localStorage |
+| Perzistence | ✅ | localStorage (`alcopilot-session`) |
+| Migrace dat | ✅ | Starý formát (plain number) → `{ts, type}` |
+| Haptická zpětná vazba | ✅ | `navigator.vibrate?.(50)` po každém SAJ |
+| Info dialog | ✅ | Verze aplikace, zavírá se tlačítkem nebo kliknutím mimo |
+| PWA manifest | ✅ | `name`, `display: standalone`, ikony 192/512 px |
+| Service Worker | ✅ | Cache-first, precache všech statických souborů |
+| Offline podpora | ✅ | Aplikace funguje bez připojení po prvním načtení |
+| Responzivní design | ✅ | Mobile-first, landscape, desktop (1024px+) |
+| Dark theme | ✅ | CSS custom properties, `#1a1a2e` pozadí |
+| Accessibility | ✅ | `aria-label`, `aria-live`, `:focus-visible` styly |
+
+---
+
+### 2. Soubory v `main`
+
+| Soubor | Účel | Stav |
+|--------|------|------|
+| `index.html` | App shell, sémantický HTML5 | ✅ Finální |
+| `style.css` | Veškeré styly (~391 řádků), dark theme, responsive | ✅ Finální |
+| `app.js` | Aplikační logika (~258 řádků) | ✅ Finální |
+| `manifest.json` | PWA manifest (name, standalone, ikony) | ✅ Finální |
+| `sw.js` | Service Worker, cache-first (CACHE_NAME v4) | ✅ Finální |
+| `icons/icon-192.png` | PWA ikona 192×192 px | ✅ |
+| `icons/icon-512.png` | PWA ikona 512×512 px | ✅ |
+| `icons/beer.png` | Drink ikona – pivo | ✅ |
+| `icons/wine.png` | Drink ikona – víno | ✅ |
+| `icons/shot.png` | Drink ikona – panák | ✅ |
+| `docs/devlog.md` | Tento soubor | 🔄 Průběžně aktualizován |
+
+---
+
+### 3. Otevřené GitHub issues
+
+#### Issue #8 — QA a finální review (OPEN)
+
+Jediný zbývající MVP issue. Vyžaduje ruční testování na fyzických/virtuálních zařízeních.
+
+**Checklist:**
+- [ ] Android Chrome (fyzické zařízení nebo emulátor)
+- [ ] iOS Safari (fyzické zařízení nebo simulátor)
+- [ ] Desktop Chrome
+- [ ] Desktop Firefox
+- [ ] Žádné JS chyby v konzoli
+- [ ] Lighthouse PWA audit — žádné kritické chyby
+- [ ] Test +SAJ / −SAJ / Reset / Storno na všech platformách
+- [ ] Test localStorage persistence (reload)
+- [ ] Test offline režimu (Service Worker)
+- [ ] Test haptiky na Android
+- [ ] Installability check (Add to Home Screen)
+
+#### Issue #21 — Info ikona (OPEN → implementováno)
+
+**Zadání:** Přidat info ikonu; kliknutím zobrazit verzi aplikace.
+
+**Acceptance criteria:**
+- [x] Ikona `ⓘ` je viditelná v pravém rohu headeru
+- [x] Minimální tap target info ikony: 44×44 px
+- [x] Kliknutím na ikonu se otevře modální dialog
+- [x] Dialog zobrazuje název aplikace ("Alcopilot") a verzi (čerpáno z `APP_VERSION`)
+- [x] Dialog lze zavřít tlačítkem "Zavřít"
+- [x] Dialog lze zavřít kliknutím na backdrop
+- [x] Dialog je přístupný klávesnicí (focus-visible styly)
+- [x] `aria-label="Informace o aplikaci"` na tlačítku i dialogu
+
+**Stav:** Vše implementováno. Issue lze uzavřít.
+
+---
+
+### 4. Technický dluh (aktualizovaný)
+
+| Problém | Priorita | Kdy řešit |
+|---------|----------|-----------|
+| `tbody:empty::after` cross-browser quirks | Nízká | Issue #8 (QA) |
+| Stale branches (`feature/pwa`, `feature/ui-layout` apod.) | Nízká | Úklid po MVP |
+| Issue #21 stále otevřen přes dokončenou implementaci | Nízká | Uzavřít ručně |
+
+---
+
+### 5. Návrh dalších kroků
+
+#### Okamžité kroky
+1. **Uzavřít Issue #21** — funkce je plně implementována (PR #23 mergnuto)
+2. **Dokončit Issue #8 (QA)** — ruční testování na zařízeních, Lighthouse audit
+
+#### Milestone 2 — možná budoucí rozšíření (dle SPEC.md)
+
+| Funkce | Popis | Složitost |
+|--------|-------|-----------|
+| Historie sessions | Uložení zakončených sessions do localStorage, zobrazení přehledu | Střední |
+| Statistiky | Průměrný interval mezi SAJ, SAJ/hodinu | Nízká |
+| Export session | Sdílení nebo export dat (CSV, text) | Nízká |
+| Notifikace / upozornění | Push notifikace po X SAJ nebo po X minutách | Vysoká |
+| Limit SAJ | Nastavení denního limitu s vizuálním varováním | Střední |
+| Celkový čas session | Zobrazení délky celé session na hlavní obrazovce | Nízká |
+
+#### Doporučené pořadí pro Milestone 2
+
+1. **Celkový čas session** — jednoduchá UI úprava, velká přidaná hodnota
+2. **Statistiky** — průměrný interval a SAJ/hod vypočítáme z existujících dat
+3. **Historie sessions** — uložení při Reset, přehledová stránka
+4. **Limit SAJ** — konfigurovatelný limit s barevným varováním
+5. **Export** — sdílení textem nebo CSV
+6. **Notifikace** — nejvyšší složitost, vyžaduje Service Worker push API
+
+---
+
+### 6. Identifikované drobné problémy
+
+Na základě průzkumu kódu bylo identifikováno několik drobností:
+
+| Problém | Soubor | Řádek | Závažnost | Stav |
+|---------|--------|-------|-----------|------|
+| Live timer (setInterval) se aktualizuje každých 60 s, ale zobrazení může být o až 60 s zpožděno oproti reálnému stavu | `app.js` | 154–156 | Nízká — dle spec je to záměrné | Záměrné |
+| Service Worker cacheuje `./` i `./index.html` zvlášť — duplikace | `sw.js` | 5–6 | Nízká | Záměrné (různé URL) |
+| `APP_VERSION` je hardcoded — při vydání nové verze nutná ruční úprava | `app.js` | 3 | Nízká | Akceptováno (no build step) |
