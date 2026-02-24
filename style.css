@@ -49,6 +49,7 @@ body {
   width: 100%;
   max-width: 600px;
   padding: 1rem 1.25rem 0;
+  position: relative;
 }
 
 .app-title {
@@ -59,6 +60,32 @@ body {
   color: var(--text-secondary);
   text-transform: uppercase;
   text-align: center;
+}
+
+.btn-info {
+  position: absolute;
+  top: 50%;
+  right: 1.25rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s;
+}
+
+.btn-info:hover {
+  color: var(--text-primary);
+}
+
+.btn-info:focus-visible {
+  outline: 3px solid var(--accent-plus);
+  outline-offset: 3px;
 }
 
 /* ============================================================

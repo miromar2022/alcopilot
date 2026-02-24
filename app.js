@@ -1,5 +1,7 @@
 'use strict';
 
+const APP_VERSION = '1.0.0';
+
 /* ============================================================
    DOM references
    ============================================================ */
@@ -14,6 +16,7 @@ const els = {
   btnShot:      $('btn-shot'),
   btnRemove:    $('btn-remove'),
   btnReset:     $('btn-reset'),
+  btnInfo:      $('btn-info'),
   logBody:      $('log-body'),
 };
 
@@ -228,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
   els.btnShot.addEventListener('click', () => addSaj('shot'));
   els.btnRemove.addEventListener('click', removeSaj);
   els.btnReset.addEventListener('click', resetSession);
+  els.btnInfo.addEventListener('click', () => alert(`Verze: ${APP_VERSION}`));
   render();
 
   // Po načtení: pokud je poslední záznam < 10s starý, povolit Storno na zbývající čas
