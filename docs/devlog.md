@@ -416,3 +416,70 @@ Jediný zbývající issue pro uzavření MVP milestone.
 - UX: Zavření tlačítkem, backdrop klikem, Escape klávesou
 
 ---
+
+## DEN 6 (2026-02-24)
+
+### Versioning & Release Infrastructure (PR #26 → #30)
+
+**Rozsah:** Kompletní přepracování versioningu — od problematického automated workflow k indie-friendly manuálnímu přístupu.
+
+#### 1. Diagnostika problému (info dialog hotfix)
+- Info dialog feature mergnut, ale version bump workflow selhával
+- Root cause: Chybějící initiální git tag (`v0.0.0` fallback)
+- Workflow bug: Node.js template string interpolation v `sw.js` update kroku
+- Branch protection: GitHub Actions bot nemůže direktně pushovat do `main`
+
+#### 2. PR #26 — Dokumentace & cleanup
+- `.gitignore`: Add `C:/` (WSL Windows path exclusion)
+- `devlog.md`: Add DEN 5 summary (info dialog feature, PR review process)
+- `README.md`: Rozšířen s features list, quick start, dev instructions
+- Status: ✅ Mergnut
+
+#### 3. PR #28-#29 — Versioning cleanup
+- Smazán `.github/workflows/version-bump.yml` (137 řádků)
+  - Důvody: branch protection issues, fragile implementation, lack of transparency
+- Přidán komplexní **Versioning** section v `CLAUDE.md`:
+  - Bump rules (minor/patch/major dle Conventional Commits)
+  - Manual version bump checklist (3 soubory: app.js, manifest.json, sw.js)
+  - Git tag & push instructions
+  - **⚠️ Claude instrukce:** Zeptej se na version bump po PR merge s feat:/fix:
+- Status: ✅ PR #29 mergnut
+
+#### 4. PR #30 — Release Workflow dokumentace
+- Přidán komplexní **Release Workflow** section v `CLAUDE.md` (68 řádků):
+  - 5-step process: verze → CHANGELOG → commit → tag → GitHub Release
+  - CHANGELOG.md guidelines (Keep a Changelog format)
+  - Kategorizace commits (Added/Fixed/Technical)
+  - Příklady release notes s emoji headers
+  - Vysvětlení proč manuální (indie approach, no git-cliff dependency)
+- Status: ✅ Mergnut
+
+#### 5. CHANGELOG.md & GitHub Release
+- Vytvořen `CHANGELOG.md` pro v1.0.0:
+  - MVP features (SAJ tracking, duration chart, PWA, offline, persistence)
+  - Technical highlights (zero dependencies, accessibility, dark theme)
+  - Fixes (relative paths, icon sizing, button overflow, focus styles)
+- GitHub Release v1.0.0 publikován s release notes
+- Status: ✅ CHANGELOG.md commitnut a pushován
+
+#### 6. Git housekeeping
+- Smazány staré lokální větve (celkem 13 z předchozích iterací)
+- Zbývá: `main` (aktuální) + `feature/graph` (mergnutá, v worktree)
+- Status: ✅ Clean
+
+**Výsledek:**
+- ✅ Indie/craft development approach (osvědčené praktiky)
+- ✅ Transparentní workflow (user controls versioning)
+- ✅ CLAUDE.md je nový "CI/CD" — Claude se zeptá a provede release
+- ✅ CHANGELOG.md setup (Keep a Changelog format, ready for v1.1.0+)
+- ✅ Zero external dependencies (git-cliff ne, ručně handcrafted)
+- ✅ Git history čistý, dokumentace kompletní
+
+**Příštích 5 step na releasu:**
+1. PR s `feat:` → Claude se zeptá: "Bump to 1.1.0?"
+2. User: "Yes"
+3. Claude: Updates 3 files, CHANGELOG, commit, tag
+4. Claude: `gh release create v1.1.0 --notes "..."`
+5. Release hotov ✅
+
+---
