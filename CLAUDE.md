@@ -51,3 +51,27 @@ Single-page app with no framework. All files are static assets deployed to GitHu
 - `main` is protected — all changes via PR, no direct push
 - Branch naming: `feature/<name>`, `fix/<name>`, `chore/<name>`
 - Commit style: [Conventional Commits](https://www.conventionalcommits.org/) — `feat:`, `fix:`, `chore:`, `docs:`
+
+## Versioning
+
+**Current version: 1.0.0** (in `app.js`, `manifest.json`, `sw.js`)
+
+**When to bump version:**
+- `feat:` → minor bump (1.0.0 → 1.1.0)
+- `fix:` → patch bump (1.0.0 → 1.0.1)
+- `BREAKING CHANGE` in commit body → major bump (1.0.0 → 2.0.0)
+
+**Version bump checklist (after PR merge):**
+1. Update `app.js` — `const APP_VERSION = 'X.Y.Z'`
+2. Update `manifest.json` — `"version": "X.Y.Z"`
+3. Update `sw.js` — `const CACHE_NAME = 'alcopilot-vX.Y.Z'`
+4. Create commit: `chore: bump version to X.Y.Z`
+5. Create git tag: `git tag vX.Y.Z && git push --tags`
+6. (Optional) Generate CHANGELOG: `git-cliff --tag vX.Y.Z -o CHANGELOG.md`
+
+**⚠️ Claude: Ask about versioning!**
+After merging a PR with `feat:` or `fix:` commits, check if a version bump is appropriate:
+- If it's a meaningful user-facing change → suggest bump
+- Ask: _"Should I bump the version and update app.js, manifest.json, sw.js?"_
+- User answers yes/no/what version
+- If yes → create chore commit, tag, and push
