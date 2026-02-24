@@ -73,7 +73,9 @@ body {
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.75rem;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.15s;
