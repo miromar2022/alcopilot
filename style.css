@@ -13,6 +13,9 @@
   --text-disabled:  #44445a;
   --border:         #2a2a5a;
   --tap-target:     64px;
+  --color-beer:     #f5a800;
+  --color-wine:     #9B1B30;
+  --color-shot:     #4a9eff;
 }
 
 *, *::before, *::after {

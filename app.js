@@ -26,10 +26,11 @@ let timestamps    = [];   // [{ts: Number, type: 'beer'|'wine'|'shot'}, ...]
 let timerInterval = null; // handle pro setInterval live timeru
 let stornoTimer   = null; // handle pro 10s storno timeout
 
+const _rootStyle = getComputedStyle(document.documentElement);
 const DRINK_COLORS = {
-  beer: '#f5a800',
-  wine: '#9B1B30',
-  shot: '#4a9eff',
+  beer: _rootStyle.getPropertyValue('--color-beer').trim() || '#f5a800',
+  wine: _rootStyle.getPropertyValue('--color-wine').trim() || '#9B1B30',
+  shot: _rootStyle.getPropertyValue('--color-shot').trim() || '#4a9eff',
 };
 
 const LS_KEY = 'alcopilot-session';
@@ -134,7 +135,7 @@ function renderChart() {
   // SVG layout
   const VW = 320;
   const VH = 160;
-  const PAD = { top: 10, right: 8, bottom: 28, left: 36 };
+  const PAD = { top: 10, right: 16, bottom: 28, left: 36 };
   const plotW = VW - PAD.left - PAD.right;
   const plotH = VH - PAD.top  - PAD.bottom;
 
@@ -156,7 +157,16 @@ function renderChart() {
   };
 
   const svg = els.chart;
+  const colorBorder    = _rootStyle.getPropertyValue('--border').trim()         || '#2a2a5a';
+  const colorTextSecondary = _rootStyle.getPropertyValue('--text-secondary').trim() || '#8888aa';
+
   svg.innerHTML = '';
+
+  // Přístupnost: <title> se souhrnem dat pro screen readery
+  const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+  titleEl.textContent = 'Graf doby konzumace: ' +
+    bars.map(b => `nápoj ${b.index}: ${Math.round(b.ms / 60000)} min`).join(', ');
+  svg.appendChild(titleEl);
 
   // Gridlines + Y labels (0, 25%, 50%, 75%, 100% maxMin)
   const ticks = [0, 0.25, 0.5, 0.75, 1].map(f => Math.round(f * maxMin));
@@ -165,14 +175,14 @@ function renderChart() {
     // gridline
     svg.appendChild(mk('line', {
       x1: PAD.left, y1: y, x2: PAD.left + plotW, y2: y,
-      stroke: '#2a2a5a', 'stroke-width': 1,
+      stroke: colorBorder, 'stroke-width': 1,
     }));
     // label
     const lbl = mk('text', {
       x: PAD.left - 4, y: y + 4,
       'text-anchor': 'end',
       'font-size': '9',
-      fill: '#8888aa',
+      fill: colorTextSecondary,
     });
     lbl.textContent = t < 60 ? `${t}m` : `${Math.floor(t/60)}h`;
     svg.appendChild(lbl);
@@ -199,7 +209,7 @@ function renderChart() {
       y: VH - PAD.bottom + 12,
       'text-anchor': 'middle',
       'font-size': '9',
-      fill: '#8888aa',
+      fill: colorTextSecondary,
     });
     lbl.textContent = b.index;
     svg.appendChild(lbl);

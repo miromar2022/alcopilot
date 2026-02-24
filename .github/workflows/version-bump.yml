@@ -19,19 +19,32 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Get latest tag
         id: get_tag
         run: |
           TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
+      - name: Check for new commits since last tag
+        id: check_commits
+        run: |
+          TAG=${{ steps.get_tag.outputs.tag }}
+          COUNT=$(git log ${TAG}..HEAD --oneline 2>/dev/null | wc -l)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+          echo "Nové commity od $TAG: $COUNT"
+
       - name: Determine bump type from Conventional Commits
         id: bump_type
+        if: steps.check_commits.outputs.count > 0
         run: |
           TAG=${{ steps.get_tag.outputs.tag }}
           COMMITS=$(git log ${TAG}..HEAD --pretty=format:"%s" 2>/dev/null || git log --pretty=format:"%s")
 
-          if echo "$COMMITS" | grep -qiE "BREAKING[[:space:]]CHANGE|^[a-z]+(\([^)]+\))?!:"; then
+          if echo "$COMMITS" | grep -qiE "BREAKING[[:space:]]CHANGE:|^[a-z]+(\([^)]+\))?!:"; then
             echo "type=major" >> $GITHUB_OUTPUT
           elif echo "$COMMITS" | grep -qE "^feat(\([^)]+\))?:"; then
             echo "type=minor" >> $GITHUB_OUTPUT
@@ -41,6 +54,7 @@ jobs:
 
       - name: Calculate new version
         id: new_version
+        if: steps.check_commits.outputs.count > 0
         run: |
           CURRENT=$(node -p "require('./manifest.json').version")
           IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
@@ -55,26 +69,27 @@ jobs:
           echo "Bump type: ${{ steps.bump_type.outputs.type }} → $CURRENT → $NEW"
 
       - name: Install git-cliff
+        if: steps.check_commits.outputs.count > 0
         uses: taiki-e/install-action@v2
         with:
           tool: git-cliff
 
       - name: Generate CHANGELOG.md
+        if: steps.check_commits.outputs.count > 0
         run: |
           VERSION=${{ steps.new_version.outputs.version }}
           git-cliff --tag "v${VERSION}" -o CHANGELOG.md
 
       - name: Extract release notes (latest verze)
         id: release_notes
+        if: steps.check_commits.outputs.count > 0
         run: |
           VERSION=${{ steps.new_version.outputs.version }}
-          # Vygeneruje pouze sekci pro tuto verzi (bez hlavičky souboru)
-          NOTES=$(git-cliff --tag "v${VERSION}" --latest --strip header)
-          # Uložit do souboru kvůli multiline
-          echo "$NOTES" > /tmp/release_notes.md
+          git-cliff --tag "v${VERSION}" --latest --strip header > /tmp/release_notes.md
           echo "notes_file=/tmp/release_notes.md" >> $GITHUB_OUTPUT
 
       - name: Update manifest.json
+        if: steps.check_commits.outputs.count > 0
         run: |
           VERSION=${{ steps.new_version.outputs.version }}
           node -e "
@@ -85,11 +100,22 @@ jobs:
           "
 
       - name: Update CACHE_NAME in sw.js
+        if: steps.check_commits.outputs.count > 0
         run: |
           VERSION=${{ steps.new_version.outputs.version }}
-          sed -i "s/const CACHE_NAME = 'alcopilot-v[^']*'/const CACHE_NAME = 'alcopilot-v${VERSION}'/" sw.js
+          node -e "
+            const fs = require('fs');
+            const path = 'sw.js';
+            const content = fs.readFileSync(path, 'utf8');
+            const updated = content.replace(
+              /const CACHE_NAME = 'alcopilot-v[^']*'/,
+              \`const CACHE_NAME = 'alcopilot-v\${VERSION}'\`
+            );
+            fs.writeFileSync(path, updated);
+          "
 
       - name: Commit, tag and push
+        if: steps.check_commits.outputs.count > 0
         run: |
           VERSION=${{ steps.new_version.outputs.version }}
           git config user.name "github-actions[bot]"
@@ -97,10 +123,10 @@ jobs:
           git add manifest.json sw.js CHANGELOG.md
           git commit -m "chore: bump version to v${VERSION}"
           git tag "v${VERSION}"
-          git push
-          git push --tags
+          git push && git push --tags
 
       - name: Create GitHub Release
+        if: steps.check_commits.outputs.count > 0
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
