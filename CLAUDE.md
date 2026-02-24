@@ -57,7 +57,7 @@ Single-page app with no framework. All files are static assets deployed to GitHu
 
 ## Versioning
 
-**Current version: 1.0.0** (in `app.js`, `manifest.json`, `sw.js`)
+**Current version: 1.0.1** (in `app.js`, `manifest.json`, `sw.js`)
 
 **When to bump version:**
 - `feat:` → minor bump (1.0.0 → 1.1.0)

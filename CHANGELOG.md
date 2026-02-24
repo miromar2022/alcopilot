@@ -5,6 +5,25 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] — 2026-02-24
+
+### Fixed
+
+- Resolve documentation inconsistencies across all markdown files
+- Fix version bump workflow sw.js template string interpolation bug
+- Remove broken automated version-bump workflow (replaced with manual process)
+
+### Technical
+
+- Add manual versioning guidelines and release workflow to CLAUDE.md
+- Add CHANGELOG.md with Keep a Changelog format
+- Add devlog DEN 6 entry (versioning & release infrastructure overhaul)
+- Update CLAUDE.md Key Implementation Details to reflect current UI
+- Add historical note to SPEC.md clarifying it describes original MVP plan
+- Remove orphaned `cliff.toml`
+
+---
+
 ## [1.0.0] — 2026-02-24
 
 ### Added
@@ -48,6 +67,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Notes |
 |---------|------|-------|
+| [1.0.1] | 2026-02-24 | Documentation fixes, versioning infrastructure |
 | [1.0.0] | 2026-02-24 | Initial stable release |
 
+[1.0.1]: https://github.com/miromar2022/alcopilot/releases/tag/v1.0.1
 [1.0.0]: https://github.com/miromar2022/alcopilot/releases/tag/v1.0.0
