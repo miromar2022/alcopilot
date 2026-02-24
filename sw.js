@@ -34,9 +34,21 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-/* Fetch — cache-first strategie */
+/* Fetch — stale-while-revalidate strategie
+   Vrátí okamžitě z cache (rychlost), ale na pozadí stáhne čerstvou verzi
+   a uloží do cache (aktuálnost při příštím načtení). */
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.match(event.request).then((cached) => {
+        const fetchPromise = fetch(event.request).then((response) => {
+          if (response.ok) {
+            cache.put(event.request, response.clone());
+          }
+          return response;
+        }).catch(() => cached);   // offline fallback
+        return cached || fetchPromise;
+      })
+    )
   );
 });

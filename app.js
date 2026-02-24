@@ -367,8 +367,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Service Worker registrace
+  // Service Worker registrace + auto-refresh při update
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW.addEventListener('statechange', () => {
+          // Nový SW aktivní a stránka už měla předchozí SW → reload pro čerstvé soubory
+          if (newSW.state === 'activated' && navigator.serviceWorker.controller) {
+            window.location.reload();
+          }
+        });
+      });
+    }).catch(() => {});
   }
 });
