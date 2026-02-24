@@ -1,5 +1,7 @@
 'use strict';
 
+const APP_VERSION = '1.0.0';
+
 /* ============================================================
    DOM references
    ============================================================ */
@@ -14,6 +16,10 @@ const els = {
   btnShot:      $('btn-shot'),
   btnRemove:    $('btn-remove'),
   btnReset:     $('btn-reset'),
+  btnInfo:      $('btn-info'),
+  infoDialog:   $('info-dialog'),
+  btnInfoClose: $('btn-info-close'),
+  infoVersion:  $('info-version'),
   logBody:      $('log-body'),
 };
 
@@ -228,6 +234,12 @@ document.addEventListener('DOMContentLoaded', () => {
   els.btnShot.addEventListener('click', () => addSaj('shot'));
   els.btnRemove.addEventListener('click', removeSaj);
   els.btnReset.addEventListener('click', resetSession);
+  els.infoVersion.textContent = APP_VERSION;
+  els.btnInfo.addEventListener('click', () => els.infoDialog.showModal());
+  els.btnInfoClose.addEventListener('click', () => els.infoDialog.close());
+  els.infoDialog.addEventListener('click', (e) => {
+    if (e.target === els.infoDialog) els.infoDialog.close();
+  });
   render();
 
   // Po načtení: pokud je poslední záznam < 10s starý, povolit Storno na zbývající čas
