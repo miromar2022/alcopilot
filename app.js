@@ -17,6 +17,9 @@ const els = {
   btnRemove:    $('btn-remove'),
   btnReset:     $('btn-reset'),
   btnInfo:      $('btn-info'),
+  infoDialog:   $('info-dialog'),
+  btnInfoClose: $('btn-info-close'),
+  infoVersion:  $('info-version'),
   logBody:      $('log-body'),
 };
 
@@ -231,7 +234,12 @@ document.addEventListener('DOMContentLoaded', () => {
   els.btnShot.addEventListener('click', () => addSaj('shot'));
   els.btnRemove.addEventListener('click', removeSaj);
   els.btnReset.addEventListener('click', resetSession);
-  els.btnInfo.addEventListener('click', () => alert(`Verze: ${APP_VERSION}`));
+  els.infoVersion.textContent = APP_VERSION;
+  els.btnInfo.addEventListener('click', () => els.infoDialog.showModal());
+  els.btnInfoClose.addEventListener('click', () => els.infoDialog.close());
+  els.infoDialog.addEventListener('click', (e) => {
+    if (e.target === els.infoDialog) els.infoDialog.close();
+  });
   render();
 
   // Po načtení: pokud je poslední záznam < 10s starý, povolit Storno na zbývající čas
