@@ -74,4 +74,71 @@ After merging a PR with `feat:` or `fix:` commits, check if a version bump is ap
 - If it's a meaningful user-facing change → suggest bump
 - Ask: _"Should I bump the version and update app.js, manifest.json, sw.js?"_
 - User answers yes/no/what version
-- If yes → create chore commit, tag, and push
+- If yes → proceed with full release workflow (see Release Workflow below)
+
+## Release Workflow
+
+**After user confirms version bump (e.g., 1.0.0 → 1.1.0):**
+
+1. **Update version in three files:**
+   ```bash
+   # app.js line 3
+   const APP_VERSION = '1.1.0'
+
+   # manifest.json line 3
+   "version": "1.1.0"
+
+   # sw.js line 3
+   const CACHE_NAME = 'alcopilot-v1.1.0'
+   ```
+
+2. **Generate CHANGELOG entry manually:**
+   - Collect commits since last tag: `git log v1.0.0..HEAD --oneline`
+   - Categorize by type:
+     - **Added** — `feat:` commits (user-facing features)
+     - **Fixed** — `fix:` commits (bug fixes)
+     - **Technical** — `refactor:`, infrastructure changes
+   - Update `CHANGELOG.md` — prepend new version section with date and bullet points
+   - Format: Keep a Changelog style (see existing `CHANGELOG.md`)
+
+3. **Create release commit:**
+   ```bash
+   git add app.js manifest.json sw.js CHANGELOG.md
+   git commit -m "chore: bump version to 1.1.0"
+   ```
+
+4. **Tag and push:**
+   ```bash
+   git tag v1.1.0
+   git push && git push --tags
+   ```
+
+5. **Create GitHub Release:**
+   ```bash
+   gh release create v1.1.0 \
+     --title "v1.1.0 — [Feature Name]" \
+     --notes "$(git log v1.0.0..v1.1.0 --oneline | sed 's/^/- /')"
+   ```
+   - Or manually extract key features from CHANGELOG.md
+   - Add emoji headers and formatting for readability
+
+**Example Release Notes:**
+```
+v1.1.0 — Duration Chart Visualization
+
+## Features
+- 📊 Bar chart showing time intervals between drinks
+- ⏱️ Better visual understanding of drinking pace
+
+## Fixes
+- Fixed timing calculation for long sessions
+- Improved chart responsiveness on mobile
+
+See [CHANGELOG.md](CHANGELOG.md) for full details.
+```
+
+**Why manual (not git-cliff)?**
+- `git-cliff` requires Rust binary installation
+- Indie projects benefit from handcrafted release notes
+- Gives opportunity to highlight key features for users
+- Links PR/issue context directly
