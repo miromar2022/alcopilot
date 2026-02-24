@@ -13,6 +13,9 @@
   --text-disabled:  #44445a;
   --border:         #2a2a5a;
   --tap-target:     64px;
+  --color-beer:     #f5a800;
+  --color-wine:     #9B1B30;
+  --color-shot:     #4a9eff;
 }
 
 *, *::before, *::after {
@@ -295,7 +298,37 @@ body {
 }
 
 /* ============================================================
-   7. Log section
+   7. Chart section
+   ============================================================ */
+.chart-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chart-section[hidden] {
+  display: none;
+}
+
+.chart-title {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.duration-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: var(--surface);
+  border-radius: 12px;
+}
+
+/* ============================================================
+   8. Log section
    ============================================================ */
 .log-section {
   overflow-x: auto;
@@ -354,7 +387,7 @@ body {
 }
 
 /* ============================================================
-   8. Landscape on small screens
+   9. Landscape on small screens
    ============================================================ */
 @media (orientation: landscape) and (max-height: 500px) {
   .app-main {
@@ -372,7 +405,7 @@ body {
 }
 
 /* ============================================================
-   9. Desktop
+   10. Desktop
    ============================================================ */
 @media (min-width: 1024px) {
   .app-header,
