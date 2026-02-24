@@ -15,6 +15,8 @@ const els = {
   btnRemove:    $('btn-remove'),
   btnReset:     $('btn-reset'),
   logBody:      $('log-body'),
+  chartSection: $('chart-section'),
+  chart:        $('duration-chart'),
 };
 
 /* ============================================================
@@ -23,6 +25,12 @@ const els = {
 let timestamps    = [];   // [{ts: Number, type: 'beer'|'wine'|'shot'}, ...]
 let timerInterval = null; // handle pro setInterval live timeru
 let stornoTimer   = null; // handle pro 10s storno timeout
+
+const DRINK_COLORS = {
+  beer: '#f5a800',
+  wine: '#9B1B30',
+  shot: '#4a9eff',
+};
 
 const LS_KEY = 'alcopilot-session';
 
@@ -98,6 +106,103 @@ function loadSession() {
     }
   } catch {
     timestamps = [];
+  }
+}
+
+/* ============================================================
+   Chart render
+   ============================================================ */
+function renderChart() {
+  // Potřebujeme alespoň 2 záznamy → 1 dokončený interval
+  // Poslední záznam NEZOBRAZUJEME — jeho doba konzumace ještě běží
+  if (timestamps.length < 2) {
+    els.chartSection.hidden = true;
+    return;
+  }
+  els.chartSection.hidden = false;
+
+  // Dokončené doby: timestamps[0..n-2], interval vždy do následujícího
+  const bars = [];
+  for (let i = 0; i < timestamps.length - 1; i++) {
+    bars.push({
+      index: i + 1,
+      type:  timestamps[i].type,
+      ms:    timestamps[i + 1].ts - timestamps[i].ts,
+    });
+  }
+
+  // SVG layout
+  const VW = 320;
+  const VH = 160;
+  const PAD = { top: 10, right: 8, bottom: 28, left: 36 };
+  const plotW = VW - PAD.left - PAD.right;
+  const plotH = VH - PAD.top  - PAD.bottom;
+
+  // Osa Y — zaokrouhlení maxima na nejbližší vyšší násobek 5 minut
+  const maxMs  = Math.max(...bars.map(b => b.ms));
+  const maxMin = Math.ceil(maxMs / 60000 / 5) * 5 || 5;
+
+  // Pomocníci
+  const toY  = (ms) => PAD.top + plotH - (ms / (maxMin * 60000)) * plotH;
+  const barW = Math.min((plotW / bars.length) * 0.65, 40);
+  const slot = plotW / bars.length;
+
+  // SVG namespace
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs = {}) => {
+    const el = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+    return el;
+  };
+
+  const svg = els.chart;
+  svg.innerHTML = '';
+
+  // Gridlines + Y labels (0, 25%, 50%, 75%, 100% maxMin)
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map(f => Math.round(f * maxMin));
+  for (const t of ticks) {
+    const y = toY(t * 60000);
+    // gridline
+    svg.appendChild(mk('line', {
+      x1: PAD.left, y1: y, x2: PAD.left + plotW, y2: y,
+      stroke: '#2a2a5a', 'stroke-width': 1,
+    }));
+    // label
+    const lbl = mk('text', {
+      x: PAD.left - 4, y: y + 4,
+      'text-anchor': 'end',
+      'font-size': '9',
+      fill: '#8888aa',
+    });
+    lbl.textContent = t < 60 ? `${t}m` : `${Math.floor(t/60)}h`;
+    svg.appendChild(lbl);
+  }
+
+  // Bary + X labels
+  for (let i = 0; i < bars.length; i++) {
+    const b    = bars[i];
+    const barH = (b.ms / (maxMin * 60000)) * plotH;
+    const x    = PAD.left + slot * i + (slot - barW) / 2;
+    const y    = toY(b.ms);
+
+    svg.appendChild(mk('rect', {
+      x, y,
+      width:  barW,
+      height: barH,
+      fill:   DRINK_COLORS[b.type] ?? '#888',
+      rx: 3, ry: 3,
+    }));
+
+    // X label (číslo nápoje)
+    const lbl = mk('text', {
+      x: x + barW / 2,
+      y: VH - PAD.bottom + 12,
+      'text-anchor': 'middle',
+      'font-size': '9',
+      fill: '#8888aa',
+    });
+    lbl.textContent = b.index;
+    svg.appendChild(lbl);
   }
 }
 
@@ -181,7 +286,8 @@ function render() {
     els.sessionStart.hidden = true;
   }
 
-  // Log
+  // Chart + Log
+  renderChart();
   renderLog();
 }
 
@@ -215,6 +321,7 @@ function resetSession() {
   if (!confirm('Opravdu ukončit drinking session? Tuto akci nelze vrátit.')) return;
   timestamps = [];
   localStorage.removeItem(LS_KEY);
+  els.chartSection.hidden = true;
   render();
 }
 
