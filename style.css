@@ -121,9 +121,16 @@ body {
 }
 
 .info-dialog__version {
-  margin: 0 0 1rem;
+  margin: 0 0 0.5rem;
   font-size: 0.8125rem;
   color: var(--text-secondary);
+  text-align: center;
+}
+
+.info-dialog__release {
+  margin: 0 0 1rem;
+  font-size: 0.75rem;
+  color: var(--text-disabled);
   text-align: center;
 }
 
