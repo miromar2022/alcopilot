@@ -165,6 +165,7 @@ function renderChart() {
   const _style = getComputedStyle(document.documentElement);
   const colorBorder        = _style.getPropertyValue('--border').trim()         || '#2a2a5a';
   const colorTextSecondary = _style.getPropertyValue('--text-secondary').trim() || '#8888aa';
+  const colorBar           = _style.getPropertyValue('--color-beer').trim()     || '#f5a800';
 
   svg.innerHTML = '';
 
@@ -205,7 +206,7 @@ function renderChart() {
       x, y,
       width:  barW,
       height: barH,
-      fill:   DRINK_COLORS[b.type] ?? '#888',
+      fill:   colorBar,
       rx: 3, ry: 3,
     }));
 
