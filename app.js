@@ -1,6 +1,6 @@
 'use strict';
 
-const APP_VERSION = '1.0.4';
+const APP_VERSION = '1.0.5';
 const RELEASE_DATE = new Date('2026-02-25T13:07:43Z');
 
 /* ============================================================
