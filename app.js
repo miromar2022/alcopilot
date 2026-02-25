@@ -158,10 +158,9 @@ function renderChart() {
   };
 
   const svg = els.chart;
-  const _style = getComputedStyle(document.documentElement);
-  const colorBorder        = _style.getPropertyValue('--border').trim()         || '#2a2a5a';
-  const colorTextSecondary = _style.getPropertyValue('--text-secondary').trim() || '#8888aa';
-  const colorBar           = _style.getPropertyValue('--color-chart-bar').trim() || '#f5a800';
+  const colorBorder        = '#2a2a5a';
+  const colorTextSecondary = '#8888aa';
+  const colorBar           = '#f5a800';
 
   svg.innerHTML = '';
 
