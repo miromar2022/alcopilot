@@ -57,7 +57,7 @@ Single-page app with no framework. All files are static assets deployed to GitHu
 
 ## Versioning
 
-**Current version: 1.0.1** (in `app.js`, `manifest.json`, `sw.js`)
+**Current version: 1.0.4** (in `app.js`, `manifest.json`, `sw.js`)
 
 **When to bump version:**
 - `feat:` → minor bump (1.0.0 → 1.1.0)
@@ -68,8 +68,10 @@ Single-page app with no framework. All files are static assets deployed to GitHu
 1. Update `app.js` — `const APP_VERSION = 'X.Y.Z'`
 2. Update `manifest.json` — `"version": "X.Y.Z"`
 3. Update `sw.js` — `const CACHE_NAME = 'alcopilot-vX.Y.Z'`
-4. Create commit: `chore: bump version to X.Y.Z`
-5. Create git tag: `git tag vX.Y.Z && git push --tags`
+4. Update `CHANGELOG.md` — add new version section with date and entries
+5. Create commit: `chore: bump version to X.Y.Z`
+6. Create git tag: `git tag vX.Y.Z && git push --tags`
+7. **Create GitHub Release** (MANDATORY): `gh release create vX.Y.Z --title "..." --notes "..."`
 
 **⚠️ Claude: Ask about versioning!**
 After merging a PR with `feat:` or `fix:` commits, check if a version bump is appropriate:
@@ -115,32 +117,44 @@ After merging a PR with `feat:` or `fix:` commits, check if a version bump is ap
    git push && git push --tags
    ```
 
-5. **Create GitHub Release:**
+5. **Create GitHub Release (MANDATORY):**
    ```bash
    gh release create v1.1.0 \
      --title "v1.1.0 — [Feature Name]" \
-     --notes "$(git log v1.0.0..v1.1.0 --oneline | sed 's/^/- /')"
+     --notes "$(cat <<'EOF'
+## Summary
+- ✨ Feature 1 (from CHANGELOG Added section)
+- 🐛 Fix 1 (from CHANGELOG Fixed section)
+
+See [CHANGELOG.md](docs/CHANGELOG.md) for full details.
+EOF
+   )"
    ```
-   - Or manually extract key features from CHANGELOG.md
-   - Add emoji headers and formatting for readability
+   - ⚠️ **REQUIRED:** Every git tag must have a GitHub Release
+   - Extract summary from CHANGELOG.md (Added/Fixed/Technical sections)
+   - Add emoji headers for readability
+   - Link to CHANGELOG.md for full details
 
-**Example Release Notes:**
+**Example Release Notes (from CHANGELOG):**
 ```
-v1.1.0 — Duration Chart Visualization
+## Summary
+- ✨ Bar chart visualization of drink intervals
+- 🐛 Fixed timing calculation for long sessions
+- 🧹 Code cleanup and performance improvements
 
-## Features
-- 📊 Bar chart showing time intervals between drinks
-- ⏱️ Better visual understanding of drinking pace
-
-## Fixes
-- Fixed timing calculation for long sessions
-- Improved chart responsiveness on mobile
-
-See [CHANGELOG.md](CHANGELOG.md) for full details.
+See [CHANGELOG.md](docs/CHANGELOG.md) for full details.
 ```
 
-**Why manual (not git-cliff)?**
-- `git-cliff` requires Rust binary installation
-- Indie projects benefit from handcrafted release notes
-- Gives opportunity to highlight key features for users
-- Links PR/issue context directly
+**Checklist for release creation:**
+- [ ] Tag created and pushed (`git tag v1.1.0 && git push --tags`)
+- [ ] GitHub Release created with `gh release create`
+- [ ] Release title includes version and feature highlight (e.g., `v1.1.0 — Duration Chart`)
+- [ ] Release notes include relevant sections from CHANGELOG
+- [ ] Emoji headers used for visual clarity
+- [ ] Link to CHANGELOG.md included
+
+**Why manual (not automated)?**
+- Indie/craft development — transparent, controllable, reliable
+- Developer consciously decides when to release
+- Release notes are handcrafted, not auto-generated
+- Every version gets proper documentation
