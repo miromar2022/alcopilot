@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] — 2026-02-25
+
+### Fixed
+
+- Hardcode all chart colors — remove all `getComputedStyle()` calls from `renderChart()` to eliminate persistent PWA color bug
+- Remove unused CSS custom properties (`--color-beer`, `--color-wine`, `--color-shot`, `--color-chart-bar`)
+
+---
+
 ## [1.0.5] — 2026-02-25
 
 ### Added
@@ -106,6 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Notes |
 |---------|------|-------|
+| [1.0.6] | 2026-02-25 | Hardcode all chart colors, remove getComputedStyle |
 | [1.0.5] | 2026-02-25 | Display release date in info dialog |
 | [1.0.4] | 2026-02-25 | Unify chart bar color via CSS custom property |
 | [1.0.3] | 2026-02-24 | Fix SW caching strategy, auto-reload on update |
@@ -113,6 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | [1.0.1] | 2026-02-24 | Documentation fixes, versioning infrastructure |
 | [1.0.0] | 2026-02-24 | Initial stable release |
 
+[1.0.6]: https://github.com/miromar2022/alcopilot/releases/tag/v1.0.6
 [1.0.5]: https://github.com/miromar2022/alcopilot/releases/tag/v1.0.5
 [1.0.4]: https://github.com/miromar2022/alcopilot/releases/tag/v1.0.4
 [1.0.3]: https://github.com/miromar2022/alcopilot/releases/tag/v1.0.3
