@@ -1,6 +1,7 @@
 'use strict';
 
 const APP_VERSION = '1.0.4';
+const RELEASE_DATE = new Date('2026-02-25T13:07:43Z');
 
 /* ============================================================
    DOM references
@@ -20,6 +21,7 @@ const els = {
   infoDialog:   $('info-dialog'),
   btnInfoClose: $('btn-info-close'),
   infoVersion:  $('info-version'),
+  infoRelease:  $('info-release'),
   logBody:      $('log-body'),
   chartSection: $('chart-section'),
   chart:        $('duration-chart'),
@@ -347,6 +349,11 @@ document.addEventListener('DOMContentLoaded', () => {
   els.btnRemove.addEventListener('click', removeSaj);
   els.btnReset.addEventListener('click', resetSession);
   els.infoVersion.textContent = APP_VERSION;
+  els.infoRelease.textContent = RELEASE_DATE.toLocaleDateString('cs-CZ', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
   els.btnInfo.addEventListener('click', () => els.infoDialog.showModal());
   els.btnInfoClose.addEventListener('click', () => els.infoDialog.close());
   els.infoDialog.addEventListener('click', (e) => {

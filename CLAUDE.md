@@ -71,7 +71,8 @@ Single-page app with no framework. All files are static assets deployed to GitHu
 4. Update `CHANGELOG.md` — add new version section with date and entries
 5. Create commit: `chore: bump version to X.Y.Z`
 6. Create git tag: `git tag vX.Y.Z && git push --tags`
-7. **Create GitHub Release** (MANDATORY): `gh release create vX.Y.Z --title "..." --notes "..."`
+7. **Create GitHub Release** (MANDATORY): `gh release create vX.Y.Z --title "..." --notes "..."` → copy **publishedAt timestamp** for step 8
+8. Update `app.js` — `const RELEASE_DATE = new Date('YYYY-MM-DDTHH:MM:SSZ')` (use publishedAt from GitHub release)
 
 **⚠️ Claude: Ask about versioning!**
 After merging a PR with `feat:` or `fix:` commits, check if a version bump is appropriate:
